@@ -89,7 +89,7 @@ export function render() {
           <div class="rake-options" role="radiogroup" aria-label="Rake percentage">
             ${RAKE_OPTIONS.map(pct => `
               <label class="rake-option">
-                <input type="radio" name="rakePercent" value="${pct}" ${pct === 2 ? 'checked' : ''} />
+                <input type="radio" name="rakePercent" value="${pct}" ${pct === 3 ? 'checked' : ''} />
                 <span class="rake-option-label">${pct}%</span>
               </label>
             `).join('')}

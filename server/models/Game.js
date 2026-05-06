@@ -26,7 +26,24 @@ const gameSchema = new Schema({
   rakePercent: {
     type: Number,
     enum: [1, 2, 2.5, 3, 5],
+    default: 3,
     required: true
+  },
+  // registry: per-player buy-in, lending, and cashout chips
+  // { "PlayerName": { buyIn: 500, lent: 200, chips: { white: 2, red: 1, green: 0, blue: 0 } } }
+  registry: {
+    type: Map,
+    of: new mongoose.Schema({
+      buyIn: { type: Number, default: 0 },
+      lent:  { type: Number, default: 0 },
+      chips: {
+        white: { type: Number, default: 0 },
+        red:   { type: Number, default: 0 },
+        green: { type: Number, default: 0 },
+        blue:  { type: Number, default: 0 },
+      }
+    }, { _id: false }),
+    default: {}
   },
   status: {
     type: String,

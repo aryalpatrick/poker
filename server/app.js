@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 
@@ -9,15 +10,26 @@ const requireAuth = require('./middleware/requireAuth');
 const gamesRouter = require('./routes/games');
 const roundsRouter = require('./routes/rounds');
 
-// Initiate DB connection at module load — Mongoose caches the connection so
-// warm Vercel invocations reuse it without reconnecting on every request.
-db.connect().catch(err => console.error('Initial DB connection failed:', err.message));
-
 const app = express();
+
+// Serve static files from public/ (for local dev — Vercel handles this via rewrites)
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Body parsing middleware
 app.use(express.json());
 app.use(cookieParser());
+
+// Lazy DB connection — connects on first request, reuses on warm invocations.
+// Skipped for auth routes which don't touch the DB.
+app.use(async (req, res, next) => {
+  if (req.path.startsWith('/api/auth')) return next();
+  try {
+    await db.connect();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 // Auth routes (no auth guard)
 app.use('/api/auth', authRouter);
@@ -31,6 +43,11 @@ app.use('/api/games', requireAuth, roundsRouter);
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
+});
+
+// SPA fallback — serve index.html for any non-API route (local dev)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 // Global error handler

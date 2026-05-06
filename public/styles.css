@@ -1,5 +1,5 @@
 /* ============================================================
-   Poker App — Dark Felt Green Theme
+   Poker App — Redesigned Dark Theme
    Mobile-first, single-column layout
    ============================================================ */
 
@@ -12,18 +12,26 @@
 
 /* ---- CSS Custom Properties ---- */
 :root {
-  --color-bg:        #0d2b1a;
-  --color-surface:   #1e4a30;
-  --color-surface-2: #163d26;
-  --color-text:      #f0f0f0;
-  --color-text-muted:#a0b8a8;
-  --color-accent:    #f0c040;
-  --color-error:     #e05050;
-  --color-success:   #4caf50;
-  --color-border:    rgba(255, 255, 255, 0.15);
-  --radius-sm:       6px;
-  --radius-md:       10px;
-  --radius-lg:       16px;
+  --color-bg:          #0a1f13;
+  --color-surface:     #112a1a;
+  --color-surface-2:   #0d2316;
+  --color-surface-3:   #1a3d26;
+  --color-text:        #eef2ee;
+  --color-text-muted:  #7a9e87;
+  --color-accent:      #f5c842;
+  --color-accent-dim:  rgba(245, 200, 66, 0.12);
+  --color-error:       #e05555;
+  --color-success:     #3dba5e;
+  --color-success-dim: rgba(61, 186, 94, 0.15);
+  --color-danger:      #d94f4f;
+  --color-border:      rgba(255, 255, 255, 0.08);
+  --color-border-mid:  rgba(255, 255, 255, 0.14);
+  --radius-sm:         8px;
+  --radius-md:         12px;
+  --radius-lg:         18px;
+  --radius-xl:         24px;
+  --shadow-card:       0 2px 12px rgba(0,0,0,0.35);
+  --shadow-btn:        0 2px 8px rgba(0,0,0,0.3);
 }
 
 /* ---- Base ---- */
@@ -39,11 +47,11 @@ body {
   min-height: 100vh;
 }
 
-/* ---- App Container (mobile-first: max 430px) ---- */
+/* ---- App Container ---- */
 .app-container {
   max-width: 430px;
   margin: 0 auto;
-  padding: 0 16px 32px;
+  padding: 0 16px 40px;
   min-height: 100vh;
 }
 
@@ -52,13 +60,15 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 0;
+  padding: 18px 0 14px;
+  gap: 8px;
 }
 
 .screen-title {
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 1.4rem;
+  font-weight: 700;
   color: var(--color-text);
+  letter-spacing: -0.3px;
 }
 
 /* ---- Buttons ---- */
@@ -66,42 +76,57 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px;
+  padding: 13px 20px;
   border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.2;
   text-align: center;
-  transition: opacity 0.15s ease, transform 0.1s ease;
+  transition: opacity 0.15s, transform 0.1s, background-color 0.15s;
   -webkit-tap-highlight-color: transparent;
+  box-shadow: var(--shadow-btn);
 }
 
 .btn:active {
-  opacity: 0.85;
-  transform: scale(0.97);
+  opacity: 0.82;
+  transform: scale(0.96);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-primary {
-  background-color: var(--color-success);
+  background: linear-gradient(135deg, #3dba5e, #2ea04f);
   color: #fff;
 }
 
 .btn-secondary {
-  background-color: var(--color-surface);
+  background-color: var(--color-surface-3);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-mid);
+  box-shadow: none;
 }
 
 .btn-ghost {
   background: transparent;
   color: var(--color-text-muted);
   border: none;
+  box-shadow: none;
+  padding: 8px 4px;
+  font-size: 0.9rem;
+}
+
+.btn-ghost:active {
+  color: var(--color-text);
 }
 
 .btn-danger {
-  background-color: var(--color-error);
+  background: linear-gradient(135deg, #d94f4f, #c03a3a);
   color: #fff;
 }
 
@@ -109,42 +134,62 @@ body {
   width: 100%;
 }
 
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
 /* ---- Form Elements ---- */
+.form-section {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 12px;
+  letter-spacing: 0.01em;
+}
+
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .form-group label {
   display: block;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--color-text-muted);
   margin-bottom: 6px;
+  font-weight: 500;
 }
 
 input[type="text"],
 input[type="password"],
 input[type="number"] {
   width: 100%;
-  background-color: var(--color-surface);
+  background-color: var(--color-surface-3);
   color: var(--color-text);
-  border: 1px solid var(--color-border);
-  padding: 12px 14px;
+  border: 1px solid var(--color-border-mid);
+  padding: 13px 14px;
   border-radius: var(--radius-sm);
   font-size: 1rem;
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="number"]:focus {
   border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-dim);
 }
 
-input[type="text"]::placeholder,
-input[type="password"]::placeholder,
-input[type="number"]::placeholder {
+input::placeholder {
   color: var(--color-text-muted);
+  opacity: 0.7;
 }
 
 /* ---- Error / Field Error ---- */
@@ -152,29 +197,420 @@ input[type="number"]::placeholder {
 .field-error {
   color: var(--color-error);
   font-size: 0.8125rem;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
-/* ---- Pot Display ---- */
-.pot-display {
-  font-size: 2.5rem;
-  font-weight: bold;
+/* ============================================================
+   Login Screen
+   ============================================================ */
+.login-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.app-title {
+  font-size: 1.75rem;
+  font-weight: 800;
   text-align: center;
   color: var(--color-accent);
-  padding: 16px 0;
+  margin-bottom: 36px;
   letter-spacing: -0.5px;
 }
 
-/* ---- Chip Buttons ---- */
-/* inputmode="none" is set in HTML to prevent keyboard */
-.chip-btn {
-  min-width: 80px;
-  min-height: 80px;
-  border-radius: 50%;
-  font-size: 1rem;
-  font-weight: bold;
+.login-form {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-mid);
+  border-radius: var(--radius-xl);
+  padding: 28px 24px;
+  box-shadow: var(--shadow-card);
+}
+
+/* ============================================================
+   Home Screen
+   ============================================================ */
+.games-list {
+  margin-top: 4px;
+}
+
+.game-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
   cursor: pointer;
-  border: 3px solid rgba(255, 255, 255, 0.3);
+  transition: border-color 0.15s, background-color 0.15s;
+  box-shadow: var(--shadow-card);
+}
+
+.game-row:active {
+  background-color: var(--color-surface-3);
+  border-color: var(--color-border-mid);
+}
+
+.game-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.game-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.game-row-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.game-date {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.game-rake {
+  font-size: 0.8125rem;
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* ---- Game Status Badges ---- */
+.game-status--active {
+  display: inline-block;
+  background-color: var(--color-success-dim);
+  color: var(--color-success);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid rgba(61, 186, 94, 0.3);
+}
+
+.game-status--closed {
+  display: inline-block;
+  background-color: rgba(255,255,255,0.05);
+  color: var(--color-text-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--color-border);
+}
+
+/* ============================================================
+   Active Game Screen
+   ============================================================ */
+
+.active-game-screen {
+  padding-bottom: 0;
+}
+
+/* 3-column header: Back | Title (center) | Registry */
+.game-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-header-title {
+  text-align: center;
+  font-size: 1.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Top action bar — New Round button */
+.game-top-bar {
+  margin-bottom: 12px;
+}
+
+/* Round log — no max-height, scrolls naturally so bottom bar is below VH */
+.round-log-container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow-y: visible;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-card);
+}
+
+/* Bottom bar: Rake + End Game — sits below content, scrolls into view */
+.game-bottom-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 0 8px;
+  border-top: 1px solid var(--color-border-mid);
+  margin-top: 8px;
+}
+
+.game-bottom-bar .rake-selector-row { flex: 1; }
+.game-bottom-bar .btn-danger        { white-space: nowrap; flex-shrink: 0; }
+
+.rake-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.rake-selector-label {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.rake-select {
+  background-color: var(--color-surface-3);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-mid);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.rake-select:focus { border-color: var(--color-accent); }
+
+/* ============================================================
+   Registry Modal
+   ============================================================ */
+.registry-modal-panel {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.registry-subtitle {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-bottom: 14px;
+}
+
+.registry-player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reg-player-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color 0.15s;
+  gap: 8px;
+}
+
+.reg-player-row:active { border-color: var(--color-accent); }
+
+.reg-player-row-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.reg-player-row-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.reg-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.reg-tag--bought { background: var(--color-success-dim); color: var(--color-success); }
+.reg-tag--lent   { background: rgba(245,200,66,0.15);    color: var(--color-accent); }
+.reg-tag--empty  { background: rgba(255,255,255,0.05);   color: var(--color-text-muted); }
+
+/* Chip entry step */
+.reg-back-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.reg-player-name-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.reg-saved-summary {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-bottom: 10px;
+}
+
+.reg-total {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  text-align: center;
+  padding: 8px 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.reg-action-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.registry-status {
+  font-size: 0.8125rem;
+  margin-top: 8px;
+  min-height: 1.2em;
+  text-align: center;
+}
+
+.registry-status--ok  { color: var(--color-success); }
+.registry-status--err { color: var(--color-error); }
+
+/* Round rows */
+.round-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.round-row:last-child { border-bottom: none; }
+
+.round-row-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.round-number {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.round-winner {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.round-row-values {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.round-pot {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.round-rake {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* ============================================================
+   Round Entry Screen
+   ============================================================ */
+
+/* Pot display */
+.pot-display {
+  font-size: 2.75rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--color-accent);
+  padding: 12px 0 8px;
+  letter-spacing: -1px;
+}
+
+/* Chip counts row */
+.chip-counts {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.chip-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.chip-count-label {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.chip-count-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.chip-count--white .chip-count-value { color: #e8e8e8; }
+.chip-count--red   .chip-count-value { color: #e05555; }
+.chip-count--green .chip-count-value { color: #3dba5e; }
+.chip-count--blue  .chip-count-value { color: #4a9edd; }
+
+/* Chip buttons */
+.chip-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.chip-btn {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 3px solid rgba(255, 255, 255, 0.2);
   color: white;
   display: flex;
   flex-direction: column;
@@ -182,184 +618,106 @@ input[type="number"]::placeholder {
   justify-content: center;
   gap: 2px;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.1s ease, opacity 0.1s ease;
+  transition: transform 0.1s, opacity 0.1s, box-shadow 0.1s;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
 }
 
 .chip-btn:active {
-  transform: scale(0.93);
+  transform: scale(0.9);
   opacity: 0.85;
 }
 
 .chip-btn--white {
-  background: #e0e0e0;
-  color: #333;
-  border-color: rgba(0, 0, 0, 0.2);
+  background: linear-gradient(145deg, #e8e8e8, #c8c8c8);
+  color: #222;
+  border-color: rgba(0,0,0,0.15);
 }
 
 .chip-btn--red {
-  background: #c0392b;
+  background: linear-gradient(145deg, #d94f4f, #b03030);
 }
 
 .chip-btn--green {
-  background: #27ae60;
+  background: linear-gradient(145deg, #3dba5e, #2a8a42);
 }
 
 .chip-btn--blue {
-  background: #2980b9;
+  background: linear-gradient(145deg, #4a9edd, #2a72aa);
 }
 
-/* ---- Chip Buttons Grid ---- */
-.chip-buttons {
+/* Chip controls (undo/clear) */
+.chip-controls {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin: 16px 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-/* ---- Chip Count ---- */
-.chip-count {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
+/* Winner section */
+.winner-section {
+  margin-top: 4px;
 }
 
-/* ---- Winner Buttons ---- */
+.winner-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .winner-btn {
-  min-height: 60px;
   width: 100%;
-  margin-bottom: 8px;
-  background-color: var(--color-surface);
+  padding: 15px 20px;
+  background: var(--color-surface);
   color: var(--color-text);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border-mid);
   border-radius: var(--radius-md);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.winner-btn:active {
-  background-color: var(--color-success);
-  border-color: var(--color-success);
-}
-
-/* ---- Round Log ---- */
-.round-log-container {
-  height: 40vh;
-  overflow-y: auto;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface-2);
-  -webkit-overflow-scrolling: touch;
-}
-
-.round-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.round-row:last-child {
-  border-bottom: none;
-}
-
-/* ---- Game List ---- */
-.game-row {
-  display: flex;
-  flex-direction: column;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--color-border);
-  cursor: pointer;
-  gap: 4px;
-}
-
-.game-row:active {
-  opacity: 0.75;
-}
-
-/* ---- Player Card ---- */
-.player-card {
-  background-color: var(--color-surface);
-  padding: 16px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  margin-bottom: 10px;
-  border: 1px solid var(--color-border);
-  transition: border-color 0.15s ease;
-}
-
-.player-card:active {
-  border-color: var(--color-accent);
-}
-
-/* ---- Modal ---- */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.modal-panel {
-  background-color: var(--color-surface);
-  padding: 24px;
-  border-radius: var(--radius-lg);
-  max-width: 400px;
-  width: 90%;
-  border: 1px solid var(--color-border);
-}
-
-/* ---- Utility ---- */
-.hidden {
-  display: none !important;
-}
-
-/* ---- Loading / Empty State ---- */
-.loading-text,
-.empty-state {
-  color: var(--color-text-muted);
   text-align: center;
-  padding: 32px 16px;
-  font-size: 0.9375rem;
+  transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: var(--shadow-card);
 }
 
-/* ---- Game Status Badges ---- */
-.game-status--active {
-  display: inline-block;
-  background-color: var(--color-success);
+.winner-btn:active,
+.winner-btn--selected {
+  background: var(--color-success);
+  border-color: var(--color-success);
   color: #fff;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
-.game-status--closed {
-  display: inline-block;
-  background-color: #555;
-  color: #ccc;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+/* ============================================================
+   Create Game Screen
+   ============================================================ */
+.chip-values-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
-/* ---- Rake Options ---- */
+.chip-value-row {
+  margin-bottom: 0;
+}
+
+.chip-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.chip-label--white { color: #c8c8c8; }
+.chip-label--red   { color: #e05555; }
+.chip-label--green { color: #3dba5e; }
+.chip-label--blue  { color: #4a9edd; }
+
+.rake-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .rake-option {
   display: inline-flex;
   align-items: center;
@@ -367,54 +725,315 @@ input[type="number"]::placeholder {
   cursor: pointer;
   font-size: 0.9375rem;
   color: var(--color-text);
+  font-weight: 500;
 }
 
-/* ---- Total Rake Row ---- */
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ============================================================
+   Cashout Screen
+   ============================================================ */
+.cashout-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.player-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.player-card {
+  background: var(--color-surface);
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  transition: border-color 0.15s, background-color 0.15s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-card);
+}
+
+.player-card:active {
+  border-color: var(--color-accent);
+  background-color: var(--color-surface-3);
+}
+
+.player-card-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.player-card-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
 .total-rake-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 0;
-  border-top: 1px solid var(--color-border);
-  font-weight: bold;
-  font-size: 1rem;
+  padding: 16px;
+  background: var(--color-accent-dim);
+  border: 1px solid rgba(245, 200, 66, 0.2);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+}
+
+.total-rake-label {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+}
+
+.total-rake-value {
+  font-size: 1.125rem;
   color: var(--color-accent);
 }
 
 /* ============================================================
-   Tablet Media Query (431px – 1024px)
+   Modal
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+
+.modal-panel {
+  background: var(--color-surface);
+  padding: 24px 20px 32px;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  width: 100%;
+  max-width: 430px;
+  border: 1px solid var(--color-border-mid);
+  border-bottom: none;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.modal-calcs {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--color-border);
+}
+
+.calc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.calc-row--payout {
+  border-top: 1px solid var(--color-border-mid);
+  margin-top: 6px;
+  padding-top: 10px;
+}
+
+/* Chip total shown between banner and chip buttons */
+.modal-chip-total {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  padding: 8px 0 12px;
+  letter-spacing: -0.5px;
+}
+
+/* Settlement banner */
+.settlement-banner {
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.settlement-banner--pay {
+  background: rgba(213, 79, 79, 0.15);
+  border: 1px solid rgba(213, 79, 79, 0.35);
+}
+
+.settlement-banner--collect {
+  background: rgba(61, 186, 94, 0.15);
+  border: 1px solid rgba(61, 186, 94, 0.35);
+}
+
+.settlement-banner--even {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--color-border);
+}
+
+.settlement-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.settlement-amount {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.settlement-banner--pay     .settlement-amount { color: var(--color-error); }
+.settlement-banner--collect .settlement-amount { color: var(--color-success); }
+.settlement-banner--even    .settlement-amount { color: var(--color-text-muted); }
+
+/* Collapsible details */
+.calc-details {
+  margin-top: 4px;
+}
+
+.calc-details-toggle {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  list-style: none;
+  padding: 6px 0;
+  user-select: none;
+}
+
+.calc-details-toggle::-webkit-details-marker { display: none; }
+
+.calc-details-toggle::before {
+  content: '▸ ';
+  font-size: 0.75rem;
+}
+
+.calc-details[open] .calc-details-toggle::before {
+  content: '▾ ';
+}
+
+.calc-breakdown {
+  padding-top: 8px;
+}
+
+.calc-row--deduct .calc-label {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.calc-row--deduct .calc-value {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.calc-divider {
+  border-top: 1px dashed var(--color-border);
+  margin: 8px 0;
+}
+
+.calc-row--info .calc-label,
+.calc-row--info .calc-value {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.calc-row--net .calc-label {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.calc-row--net .calc-value {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.calc-label {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.calc-value {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.calc-row--payout .calc-value {
+  color: var(--color-accent);
+  font-size: 1.125rem;
+}
+
+/* ============================================================
+   Utility
+   ============================================================ */
+.hidden {
+  display: none !important;
+}
+
+.loading-text,
+.empty-state {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 40px 16px;
+  font-size: 0.9375rem;
+}
+
+/* ============================================================
+   Tablet (431px – 1024px)
    ============================================================ */
 @media (min-width: 431px) and (max-width: 1024px) {
   .app-container {
-    max-width: 768px;
+    max-width: 600px;
     padding: 0 32px 48px;
   }
 
   .chip-btn {
-    min-width: 100px;
-    min-height: 100px;
-    font-size: 1.25rem;
-  }
-
-  .winner-btn {
-    min-height: 72px;
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   .pot-display {
-    font-size: 3rem;
+    font-size: 3.25rem;
   }
 
   .screen-title {
-    font-size: 1.75rem;
+    font-size: 1.6rem;
   }
 
   .btn {
     padding: 14px 24px;
-    font-size: 1.0625rem;
+    font-size: 1rem;
   }
 
-  .round-log-container {
-    height: 45vh;
+  .modal-panel {
+    border-radius: var(--radius-xl);
+    max-width: 480px;
+    margin-bottom: 40px;
+  }
+
+  .modal-overlay {
+    align-items: center;
   }
 }

@@ -26,6 +26,7 @@ window.fetch = async function (...args) {
  *   #create-game
  *   #game/:id
  *   #round-entry/:gameId
+ *   #round-entry/:gameId/:roundId
  *   #cashout/:gameId
  *
  * @returns {{ screen: string, params: Object }}
@@ -36,11 +37,11 @@ function parseHash() {
   const screen = parts[0];
   const params = {};
 
-  // Map parameterised routes to their param names
   if (screen === 'game' && parts[1]) {
     params.id = parts[1];
   } else if (screen === 'round-entry' && parts[1]) {
     params.gameId = parts[1];
+    if (parts[2]) params.roundId = parts[2]; // edit mode
   } else if (screen === 'cashout' && parts[1]) {
     params.gameId = parts[1];
   }

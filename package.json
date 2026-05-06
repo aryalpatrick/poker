@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "start": "node api/index.js",
-    "dev": "vercel dev"
+    "dev": "vercel dev",
+    "dev:local": "node -e \"require('dotenv').config({path:'.env.local'}); require('./api/index.js').listen(process.env.PORT||3000, () => console.log('Running on http://localhost:' + (process.env.PORT||3000)))\""
   },
   "dependencies": {
     "cookie-parser": "1.4.7",

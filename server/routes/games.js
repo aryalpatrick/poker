@@ -179,6 +179,27 @@ router.patch('/:id', async (req, res, next) => {
       updates.status = status;
     }
 
+    // registry: { PlayerName: { buyIn: number, lent: number, chips?: {...} } }
+    if (req.body.registry !== undefined) {
+      const registry = req.body.registry;
+      if (typeof registry !== 'object' || Array.isArray(registry)) {
+        return res.status(400).json({ error: 'Validation failed', details: ['registry must be an object'] });
+      }
+      for (const [player, entry] of Object.entries(registry)) {
+        if (entry.buyIn !== undefined && typeof entry.buyIn !== 'number') {
+          return res.status(400).json({ error: 'Validation failed', details: [`registry.${player}: buyIn must be a number`] });
+        }
+        if (entry.lent !== undefined && typeof entry.lent !== 'number') {
+          return res.status(400).json({ error: 'Validation failed', details: [`registry.${player}: lent must be a number`] });
+        }
+        const update = {};
+        if (entry.buyIn !== undefined) update.buyIn = entry.buyIn;
+        if (entry.lent  !== undefined) update.lent  = entry.lent;
+        if (entry.chips !== undefined) update.chips = entry.chips;
+        updates[`registry.${player}`] = { buyIn: entry.buyIn || 0, lent: entry.lent || 0, ...update };
+      }
+    }
+
     const game = await Game.findByIdAndUpdate(
       req.params.id,
       { $set: updates },
