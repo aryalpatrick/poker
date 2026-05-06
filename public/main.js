@@ -127,14 +127,13 @@ async function renderCurrentScreen(screenName, params) {
 }
 
 /**
- * Check whether the user is authenticated.
- * Reads the non-httpOnly `auth_flag` cookie set by the server on login.
- * The actual auth_token is httpOnly and never readable by JS.
+ * Check whether the auth cookie is present.
+ * auth_token is not httpOnly so JS can read it to detect auth state.
  *
  * @returns {boolean}
  */
 function isAuthenticated() {
-  return document.cookie.split(';').some(c => c.trim().startsWith('auth_flag='));
+  return document.cookie.split(';').some(c => c.trim().startsWith('auth_token='));
 }
 
 /**
