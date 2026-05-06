@@ -36,7 +36,6 @@ router.post('/login', (req, res) => {
   const cookieValue = `${payload}.${signature}`;
 
   res.cookie('auth_token', cookieValue, {
-    httpOnly: true,
     secure: true,
     sameSite: 'strict',
   });
@@ -53,7 +52,6 @@ router.post('/login', (req, res) => {
  */
 router.post('/logout', (req, res) => {
   res.clearCookie('auth_token', {
-    httpOnly: true,
     secure: true,
     sameSite: 'strict',
   });
