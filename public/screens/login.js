@@ -72,7 +72,12 @@ function attachListeners() {
       });
 
       if (res.ok) {
-        navigate('home');
+        // Set hash first, then render directly — bypasses the isAuthenticated
+        // guard in onHashChange which can fire before the cookie is readable.
+        window.location.hash = '#home';
+        const mod = await import('./home.js');
+        const appEl = document.getElementById('app');
+        appEl.innerHTML = await mod.render({});
       } else if (res.status === 401) {
         errorEl.textContent = 'Invalid credentials';
         submitBtn.disabled = false;

@@ -7,7 +7,6 @@ const request = require('supertest');
 
 // Set env vars before requiring the app
 beforeAll(() => {
-  process.env.COOKIE_SECRET = 'test-secret';
   process.env.AUTH_USERNAME = 'admin';
   process.env.AUTH_PASSWORD = 'password';
 });

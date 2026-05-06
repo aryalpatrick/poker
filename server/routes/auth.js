@@ -1,7 +1,6 @@
 'use strict';
 
 const express = require('express');
-const { hmac } = require('../middleware/requireAuth');
 
 const router = express.Router();
 
@@ -9,18 +8,14 @@ const router = express.Router();
  * POST /api/auth/login
  *
  * Compares req.body.username and req.body.password against AUTH_USERNAME / AUTH_PASSWORD env vars.
- * On match: creates a signed auth_token cookie (payload = username, sig = HMAC-SHA256(username, COOKIE_SECRET))
- * and returns 200 { ok: true }.
+ * On match: sets a simple auth_token cookie (base64 of username:password) and returns 200 { ok: true }.
  * On mismatch: returns 401 { error: 'Invalid credentials' }.
- *
- * Requirements: 1.1, 1.2, 1.3
  */
 router.post('/login', (req, res) => {
   const { username, password } = req.body || {};
 
   const validUsername = process.env.AUTH_USERNAME;
   const validPassword = process.env.AUTH_PASSWORD;
-  const secret = process.env.COOKIE_SECRET;
 
   if (
     typeof username !== 'string' ||
@@ -31,9 +26,7 @@ router.post('/login', (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
-  const payload = username;
-  const signature = hmac(payload, secret);
-  const cookieValue = `${payload}.${signature}`;
+  const cookieValue = Buffer.from(`${username}:${password}`).toString('base64');
 
   res.cookie('auth_token', cookieValue, {
     secure: true,
@@ -46,9 +39,7 @@ router.post('/login', (req, res) => {
 /**
  * POST /api/auth/logout
  *
- * Clears the auth_token cookie with the same flags and returns 200 { ok: true }.
- *
- * Requirements: 1.1, 1.2
+ * Clears the auth_token cookie and returns 200 { ok: true }.
  */
 router.post('/logout', (req, res) => {
   res.clearCookie('auth_token', {

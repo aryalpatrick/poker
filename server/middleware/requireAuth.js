@@ -1,23 +1,12 @@
 'use strict';
 
-const crypto = require('crypto');
-
-/**
- * Compute HMAC-SHA256 of payload using the given secret, returned as hex.
- */
-function hmac(payload, secret) {
-  return crypto.createHmac('sha256', secret).update(payload).digest('hex');
-}
-
 /**
  * requireAuth middleware
  *
- * Reads the `auth_token` cookie and verifies its HMAC-SHA256 signature.
- * Cookie format: `<payload>.<signature>` where signature = HMAC-SHA256(payload, COOKIE_SECRET) as hex.
+ * Checks that the `auth_token` cookie is present and equals the expected value
+ * (AUTH_USERNAME:AUTH_PASSWORD encoded as base64).
  *
- * Calls next() on success; returns 401 { error: 'Unauthorized' } on missing or invalid cookie.
- *
- * Requirements: 1.4, 1.5
+ * Calls next() on success; returns 401 { error: 'Unauthorized' } otherwise.
  */
 function requireAuth(req, res, next) {
   const token = req.cookies && req.cookies.auth_token;
@@ -26,26 +15,11 @@ function requireAuth(req, res, next) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const dotIndex = token.lastIndexOf('.');
-  if (dotIndex === -1) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+  const expected = Buffer.from(
+    `${process.env.AUTH_USERNAME}:${process.env.AUTH_PASSWORD}`
+  ).toString('base64');
 
-  const payload = token.slice(0, dotIndex);
-  const signature = token.slice(dotIndex + 1);
-
-  const secret = process.env.COOKIE_SECRET;
-  if (!secret) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  const expected = hmac(payload, secret);
-
-  // Use timingSafeEqual to prevent timing attacks
-  const sigBuf = Buffer.from(signature, 'hex');
-  const expBuf = Buffer.from(expected, 'hex');
-
-  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+  if (token !== expected) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -53,4 +27,3 @@ function requireAuth(req, res, next) {
 }
 
 module.exports = requireAuth;
-module.exports.hmac = hmac;

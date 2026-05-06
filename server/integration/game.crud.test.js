@@ -10,7 +10,6 @@
 // Set env vars BEFORE requiring the app
 // ---------------------------------------------------------------------------
 beforeAll(() => {
-  process.env.COOKIE_SECRET = 'test-secret';
   process.env.AUTH_USERNAME = 'admin';
   process.env.AUTH_PASSWORD = 'password';
   process.env.MONGODB_URI = 'mongodb://localhost/test';
@@ -27,7 +26,6 @@ jest.mock('../models/Game');
 jest.mock('../models/Round');
 
 const request = require('supertest');
-const crypto = require('crypto');
 const mongoose = require('mongoose');
 const Game = require('../models/Game');
 const Round = require('../models/Round');
@@ -36,10 +34,9 @@ const app = require('../app');
 // ---------------------------------------------------------------------------
 // Helper: build a valid auth_token cookie
 // ---------------------------------------------------------------------------
-function makeAuthCookie(secret = 'test-secret') {
-  const payload = 'admin';
-  const sig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
-  return `auth_token=${payload}.${sig}`;
+function makeAuthCookie() {
+  const value = Buffer.from('admin:password').toString('base64');
+  return `auth_token=${value}`;
 }
 
 const AUTH_COOKIE = makeAuthCookie();
