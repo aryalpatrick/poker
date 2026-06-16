@@ -216,6 +216,48 @@ router.patch('/:id', async (req, res, next) => {
   }
 });
 
+/**
+ * POST /api/games/:id/players
+ * Add a new player mid-game.
+ */
+router.post('/:id/players', async (req, res, next) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+
+    const { name } = req.body;
+    if (typeof name !== 'string' || name.trim().length === 0) {
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: ['Player name must be a non-empty string']
+      });
+    }
+
+    const playerName = name.trim();
+    const game = await Game.findById(req.params.id);
+
+    if (!game) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+
+    if (game.status === 'closed') {
+      return res.status(400).json({ error: 'Cannot add players to a closed game' });
+    }
+
+    if (game.players.includes(playerName)) {
+      return res.status(400).json({ error: 'Validation failed', details: ['Player already exists in game'] });
+    }
+
+    game.players.push(playerName);
+    await game.save();
+
+    res.status(200).json(game.toObject());
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
 module.exports.validateGameFields = validateGameFields;
 module.exports.VALID_RAKE_PERCENTS = VALID_RAKE_PERCENTS;

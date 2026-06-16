@@ -92,6 +92,22 @@ export function render(params) {
         </div>
       </div>
 
+      <!-- Add Player modal -->
+      <div id="add-player-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-panel">
+          <div class="modal-header">
+            <h2 class="modal-title">Add Player</h2>
+            <button id="add-player-close-btn" class="btn btn-ghost" aria-label="Close">✕</button>
+          </div>
+          <div class="form-group" style="padding: 16px;">
+            <label for="new-player-name" class="form-label">Player Name</label>
+            <input type="text" id="new-player-name" class="form-control" placeholder="e.g. Alice">
+            <div id="add-player-error" class="error-message" style="margin-top:8px;" aria-live="polite"></div>
+            <button id="submit-new-player-btn" class="btn btn-primary btn-full" style="margin-top:16px;">Add Player</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   `;
 }
@@ -105,13 +121,65 @@ async function attachListeners(params) {
   document.getElementById('back-btn')?.addEventListener('click', () => navigate('home'));
   document.getElementById('registry-btn')?.addEventListener('click', openRegistryModal);
   document.getElementById('registry-close-btn')?.addEventListener('click', closeRegistryModal);
+  document.getElementById('add-player-close-btn')?.addEventListener('click', closeAddPlayerModal);
+  document.getElementById('submit-new-player-btn')?.addEventListener('click', submitNewPlayer);
 
   // Close on overlay click
   document.getElementById('registry-modal')?.addEventListener('click', e => {
     if (e.target === document.getElementById('registry-modal')) closeRegistryModal();
   });
+  document.getElementById('add-player-modal')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('add-player-modal')) closeAddPlayerModal();
+  });
 
   await loadGame(id);
+}
+
+function openAddPlayerModal() {
+  const errorEl = document.getElementById('add-player-error');
+  if (errorEl) errorEl.textContent = '';
+  const inputEl = document.getElementById('new-player-name');
+  if (inputEl) inputEl.value = '';
+  document.getElementById('add-player-modal')?.classList.remove('hidden');
+}
+
+function closeAddPlayerModal() {
+  document.getElementById('add-player-modal')?.classList.add('hidden');
+}
+
+async function submitNewPlayer() {
+  const inputEl = document.getElementById('new-player-name');
+  const name = inputEl?.value?.trim();
+  const errorEl = document.getElementById('add-player-error');
+  const btn = document.getElementById('submit-new-player-btn');
+
+  if (!name) {
+    if (errorEl) errorEl.textContent = 'Player name is required';
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Adding...'; }
+  if (errorEl) errorEl.textContent = '';
+
+  try {
+    const res = await fetch(`/api/games/${_game._id}/players`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      if (errorEl) errorEl.textContent = data.details?.[0] || data.error || 'Failed to add player';
+    } else {
+      _game = await res.json();
+      closeAddPlayerModal();
+    }
+  } catch {
+    if (errorEl) errorEl.textContent = 'Network error. Please try again.';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Add Player'; }
+  }
 }
 
 async function loadGame(id) {
@@ -161,9 +229,11 @@ function renderGameContent() {
   ).join('');
 
   contentEl.innerHTML = `
-    <div class="game-top-bar">
-      <button id="new-round-btn" class="btn btn-primary btn-full"
+    <div class="game-top-bar" style="display:flex; gap:8px;">
+      <button id="new-round-btn" class="btn btn-primary" style="flex:1;"
         ${_game.status === 'closed' ? 'disabled' : ''}>+ New Round</button>
+      <button id="add-player-btn" class="btn btn-secondary" style="flex:1;"
+        ${_game.status === 'closed' ? 'disabled' : ''}>+ Add Player</button>
     </div>
 
     <div class="round-log-container" id="round-log">${roundRows}</div>
@@ -184,6 +254,7 @@ function renderGameContent() {
 
   document.getElementById('new-round-btn')?.addEventListener('click', () =>
     navigate('round-entry', { gameId: _game._id }));
+  document.getElementById('add-player-btn')?.addEventListener('click', openAddPlayerModal);
   document.getElementById('end-game-btn')?.addEventListener('click', handleEndGame);
   document.getElementById('cashout-btn')?.addEventListener('click', () =>
     navigate('cashout', { gameId: _game._id }));

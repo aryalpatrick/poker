@@ -378,3 +378,98 @@ describe('GET /api/games — list games with totalRake aggregation', () => {
     expect(res.status).toBe(401);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Test: Add player mid-game (POST /api/games/:id/players)
+// ---------------------------------------------------------------------------
+describe('POST /api/games/:id/players — add player mid-game', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('adds a new player to the game', async () => {
+    const game = makeMockGame({ players: ['Alice', 'Bob'] });
+    
+    // Create a mock save function that returns undefined
+    const mockSave = jest.fn().mockResolvedValue(undefined);
+    
+    // We need Game.findById to return an object with save and players array
+    const gameDoc = {
+      ...game,
+      save: mockSave,
+      toObject: jest.fn().mockReturnValue({ ...game, players: ['Alice', 'Bob', 'Charlie'] })
+    };
+
+    Game.findById = jest.fn().mockResolvedValue(gameDoc);
+
+    const res = await request(app)
+      .post(`/api/games/${game._id.toString()}/players`)
+      .set('Cookie', AUTH_COOKIE)
+      .send({ name: 'Charlie' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.players).toEqual(['Alice', 'Bob', 'Charlie']);
+    expect(gameDoc.players).toEqual(['Alice', 'Bob', 'Charlie']);
+    expect(mockSave).toHaveBeenCalled();
+  });
+
+  test('returns 400 if player already exists', async () => {
+    const game = makeMockGame({ players: ['Alice', 'Bob'] });
+    const gameDoc = {
+      ...game,
+      save: jest.fn().mockResolvedValue(undefined)
+    };
+
+    Game.findById = jest.fn().mockResolvedValue(gameDoc);
+
+    const res = await request(app)
+      .post(`/api/games/${game._id.toString()}/players`)
+      .set('Cookie', AUTH_COOKIE)
+      .send({ name: 'Alice' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'Validation failed');
+  });
+
+  test('returns 400 if name is empty', async () => {
+    const game = makeMockGame();
+
+    const res = await request(app)
+      .post(`/api/games/${game._id.toString()}/players`)
+      .set('Cookie', AUTH_COOKIE)
+      .send({ name: '  ' });
+
+    expect(res.status).toBe(400);
+  });
+
+  test('returns 404 if game not found', async () => {
+    const id = new mongoose.Types.ObjectId();
+    Game.findById = jest.fn().mockResolvedValue(null);
+
+    const res = await request(app)
+      .post(`/api/games/${id.toString()}/players`)
+      .set('Cookie', AUTH_COOKIE)
+      .send({ name: 'Dave' });
+
+    expect(res.status).toBe(404);
+  });
+
+  test('returns 400 if game is closed', async () => {
+    const game = makeMockGame({ players: ['Alice', 'Bob'], status: 'closed' });
+    const gameDoc = {
+      ...game,
+      save: jest.fn().mockResolvedValue(undefined)
+    };
+
+    Game.findById = jest.fn().mockResolvedValue(gameDoc);
+
+    const res = await request(app)
+      .post(`/api/games/${game._id.toString()}/players`)
+      .set('Cookie', AUTH_COOKIE)
+      .send({ name: 'Charlie' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty('error', 'Cannot add players to a closed game');
+  });
+});
+

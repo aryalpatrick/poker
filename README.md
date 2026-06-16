@@ -7,8 +7,6 @@ A mobile-first poker game management system for tracking rounds, rake, and casho
 - **Backend**: Node.js / Express (serverless via Vercel)
 - **Database**: MongoDB Atlas (Mongoose ODM)
 - **Frontend**: Vanilla JS single-page application
-- **Deployment**: Vercel (Hobby free tier)
-
 ## Environment Variables
 
 The app requires four environment variables. Set them in the Vercel dashboard under **Project → Settings → Environment Variables**:

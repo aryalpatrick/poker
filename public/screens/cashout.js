@@ -129,6 +129,17 @@ export function render(params) {
           </div>
         </div>
       </div>
+      <!-- Settlement summary modal -->
+      <div id="summary-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-panel summary-modal-panel">
+          <div class="modal-header">
+            <h2 class="modal-title">Settlement Summary</h2>
+            <button id="summary-close-btn" class="btn btn-ghost" aria-label="Close">✕</button>
+          </div>
+          <div id="summary-content"></div>
+        </div>
+      </div>
+
     </div>
   `;
 }
@@ -167,6 +178,15 @@ async function attachListeners(params) {
   document.getElementById('modal-clear-btn')?.addEventListener('click', () => {
     _modalHistory = [];
     updateModalCalcs();
+  });
+
+  document.getElementById('summary-close-btn')?.addEventListener('click', () => {
+    document.getElementById('summary-modal')?.classList.add('hidden');
+  });
+
+  document.getElementById('summary-modal')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('summary-modal'))
+      document.getElementById('summary-modal').classList.add('hidden');
   });
 
   await loadCashout(gameId);
@@ -247,6 +267,10 @@ function renderCashoutContent() {
       <span class="total-rake-label">Total Rake Collected</span>
       <span class="total-rake-value" id="total-rake-display">NPR ${formatNumber(totalRake)}</span>
     </div>
+
+    <button id="settlement-summary-btn" class="btn btn-primary btn-full settlement-summary-btn">
+      Settlement Summary
+    </button>
   `;
 
   // Attach player card listeners
@@ -260,6 +284,8 @@ function renderCashoutContent() {
       }
     });
   });
+
+  document.getElementById('settlement-summary-btn')?.addEventListener('click', showSettlementSummary);
 }
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
@@ -451,6 +477,126 @@ function refreshPlayerCard(playerName) {
     hint.textContent = 'Tap to enter chips';
     hint.style.color = '';
   }
+}
+
+// ─── Settlement Summary ───────────────────────────────────────────────────────
+
+/**
+ * Debt minimization algorithm.
+ * Given a map of { person: netBalance } where positive = owed to host, negative = host owes them,
+ * but here we treat the host as "YOU" and compute net balances for all players relative to you.
+ *
+ * Returns a list of { from, to, amount } transactions that settle all debts
+ * with the minimum number of transfers, routing through players when it saves a transaction.
+ */
+function minimizeTransactions(balances) {
+  // balances: { playerName: number }
+  // positive = they owe you, negative = you owe them
+  // Convert to a flat creditor/debtor list (all relative to cash flow)
+  // We include "YOU" as a participant with balance = -sum(all others)
+
+  const entries = Object.entries(balances).map(([name, bal]) => ({ name, bal }));
+  const youBal  = -entries.reduce((s, e) => s + e.bal, 0);
+  const all     = [...entries, { name: 'You', bal: youBal }];
+
+  // Greedy: repeatedly match largest debtor with largest creditor
+  const debtors  = all.filter(e => e.bal < 0).map(e => ({ ...e, bal: -e.bal })).sort((a,b) => b.bal - a.bal);
+  const creditors = all.filter(e => e.bal > 0).sort((a,b) => b.bal - a.bal);
+
+  const txns = [];
+  let di = 0, ci = 0;
+
+  while (di < debtors.length && ci < creditors.length) {
+    const d = debtors[di];
+    const c = creditors[ci];
+    const amount = Math.min(d.bal, c.bal);
+
+    if (amount > 0.005) { // ignore floating point dust
+      txns.push({ from: d.name, to: c.name, amount: Math.round(amount * 100) / 100 });
+    }
+
+    d.bal -= amount;
+    c.bal -= amount;
+
+    if (d.bal < 0.005) di++;
+    if (c.bal < 0.005) ci++;
+  }
+
+  return txns;
+}
+
+function showSettlementSummary() {
+  const modal   = document.getElementById('summary-modal');
+  const content = document.getElementById('summary-content');
+  if (!modal || !content || !_game) return;
+
+  // Build per-player cashToPay (positive = you pay them, negative = they pay you)
+  const missing = [];
+  const balances = {}; // { player: amount they owe you } positive = they owe you
+
+  for (const player of _game.players) {
+    const reg = getRegistry(player);
+    if (!reg || !reg.chips) { missing.push(player); continue; }
+
+    const chipValue = computePot(reg.chips, _game.chipValues);
+    const rakeOwed  = computePlayerRakeOwed(_rounds, player);
+    const lent      = reg?.lent  || 0;
+    const cashToPay = chipValue - rakeOwed - lent; // positive = you pay them
+
+    // From your perspective: positive cashToPay = you owe them = negative balance for you
+    balances[player] = -cashToPay; // positive = they owe you
+  }
+
+  if (Object.keys(balances).length === 0) {
+    content.innerHTML = `<p class="empty-state">Enter chips for at least one player first.</p>`;
+    modal.classList.remove('hidden');
+    return;
+  }
+
+  const txns = minimizeTransactions(balances);
+
+  // Net for you
+  const youNet = Object.values(balances).reduce((s, b) => s + b, 0);
+
+  const netBanner = youNet > 0
+    ? `<div class="summary-net summary-net--receive">You net receive <strong>NPR ${formatNumber(Math.round(youNet * 100)/100)}</strong></div>`
+    : youNet < 0
+    ? `<div class="summary-net summary-net--pay">You net pay <strong>NPR ${formatNumber(Math.round(Math.abs(youNet) * 100)/100)}</strong></div>`
+    : `<div class="summary-net summary-net--even">All settled — NPR 0 net</div>`;
+
+  const txnRows = txns.map(t => {
+    const fromIsYou = t.from === 'You';
+    const toIsYou   = t.to   === 'You';
+    const fromClass = fromIsYou ? 'summary-you' : 'summary-player';
+    const toClass   = toIsYou   ? 'summary-you' : 'summary-player';
+    const rowClass  = fromIsYou ? 'summary-row summary-row--pay'
+                    : toIsYou   ? 'summary-row summary-row--collect'
+                    : 'summary-row summary-row--indirect';
+    return `
+      <div class="${rowClass}">
+        <div class="summary-txn-players">
+          <span class="${fromClass}">${escapeHtml(t.from)}</span>
+          <span class="summary-arrow">→</span>
+          <span class="${toClass}">${escapeHtml(t.to)}</span>
+        </div>
+        <span class="summary-amount ${fromIsYou ? 'summary-amount--pay' : toIsYou ? 'summary-amount--collect' : 'summary-amount--indirect'}">
+          NPR ${formatNumber(t.amount)}
+        </span>
+      </div>`;
+  }).join('');
+
+  const missingNote = missing.length
+    ? `<p class="summary-missing">⚠ Not entered yet: ${missing.map(s => escapeHtml(s)).join(', ')}</p>`
+    : '';
+
+  content.innerHTML = `
+    ${netBanner}
+    <div class="summary-section-title">${txns.length} transaction${txns.length !== 1 ? 's' : ''} to settle</div>
+    <div class="summary-list">${txnRows}</div>
+    ${missingNote}
+  `;
+
+  modal.classList.remove('hidden');
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
