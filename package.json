@@ -2,6 +2,12 @@
   "name": "poker-app",
   "version": "1.0.0",
   "description": "Mobile-first poker game management system",
+  "license": "MIT",
+  "author": "Patrick Aryal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aryalpatrick/poker.git"
+  },
   "main": "api/index.js",
   "scripts": {
     "test": "jest",
